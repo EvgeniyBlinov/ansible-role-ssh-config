@@ -10,6 +10,7 @@
     executable: /bin/bash
     creates: "{{ item }}"
     warn: false
+  when: ( ssh_config__services | length>0 )
   with_items: "{{
     ssh_config__services |
     json_query('[*].hosts[*].key') |
