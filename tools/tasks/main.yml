@@ -1,0 +1,11 @@
+#  vim: set et fenc=utf-8 ff=unix sts=2 sw=2 ts=2 :
+---
+- name: ssh_config/tools | Ensure Makefile is exists
+  blockinfile:
+    path: "{{ ssh_config__sshhomedir }}/Makefile"
+    block: "{{ lookup('template', 'Makefile') }}"
+    state: present
+    insertbefore: BOF
+    create: yes
+    backup: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK FOR ssh_config"

@@ -1,0 +1,22 @@
+#  vim: set et fenc=utf-8 ff=unix sts=2 sw=2 ts=2 :
+---
+- name: ssh_config/defaults | Ensure config.d is exists
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0700
+  loop:
+    - "{{ ssh_config__dir_path }}"
+  tags:
+    - install
+
+- name: ssh_config/defaults | Ensure config.d is exists
+  ansible.builtin.file:
+    src: "{{ ssh_config__dir_path }}"
+    dest: "{{ item }}"
+    state: link
+    mode: 0700
+  loop:
+    - "{{ ssh_config__dir }}"
+  tags:
+    - install
