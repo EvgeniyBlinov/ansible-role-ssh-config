@@ -15,5 +15,10 @@ Host {{ host.host }}{{ "\n" }}
   {%- if host.key is defined  -%}
   {{ "\t" }}IdentityFile {{ host.key }}{{ "\n" }}
   {%- endif -%}
+  {%- if host.options is defined  -%}
+    {%- for option, value in host.options.items() -%}
+        {{ "\t" }}{{ option}} {{ value }}{{ "\n" }}
+    {%- endfor -%}
+  {%- endif -%}
 {{ "\n" }}
 {% endfor %}

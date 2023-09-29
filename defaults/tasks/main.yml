@@ -18,5 +18,6 @@
     mode: 0700
   loop:
     - "{{ ssh_config__dir }}"
+  ignore_errors: true
   tags:
     - install

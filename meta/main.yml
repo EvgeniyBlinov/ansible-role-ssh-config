@@ -3,6 +3,7 @@ dependencies:
   - role: "galaxy-ssh-config/defaults"
   - role: "galaxy-ssh-config/tools"
   - role: "galaxy-ssh-config/config"
+  - role: "galaxy-ssh-config/gen-keys"
 
 galaxy_info:
   author: Evgeniy Blinov

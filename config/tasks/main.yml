@@ -2,34 +2,41 @@
 ---
 #######################  install  ######################################
   # @TODO:  <07-04-19, Evgeniy Blinov <evgeniy_blinov@mail.ru>> # refactor settings
-- name: Configure | ssh_config settings
-  shell:
-    cmd: |
-      # Create settings if not found some settings
-      grep '^(Server|TCPKeepAlive|Control).*' -qP  {{ ssh_config__dir_path }}/* || \
-      cat > {{ ssh_config__dir_path }}/00_settings <<- 'EOF'
+
+- name: ssh_config/config | Create config settings
+  ansible.builtin.copy:
+    content: |-
       # vim: set noet ci pi sts=0 sw=4 ts=4 :
-      TCPKeepAlive={{ ssh_config__settings.TCPKeepAlive }}
-      {% if ssh_config__settings.ServerAliveInterval is defined %}
-      ServerAliveInterval={{ ssh_config__settings.ServerAliveInterval }}
-      {% endif %}
-      {% if ssh_config__settings.ServerAliveCountMax is defined %}
-      ServerAliveCountMax={{ ssh_config__settings.ServerAliveCountMax }}
-      {% endif %}
-      Compression={{ ssh_config__settings.Compression }}
-      ControlMaster {{ ssh_config__settings.ControlMaster }}
-      ControlPath {{ ssh_config__settings.ControlPath }}
-      ControlPersist {{ ssh_config__settings.ControlPersist }}
-      EOF
-  args:
-    executable: /bin/bash
+    dest: >-
+      {{ ssh_config__dir_path }}/00_settings
+    mode: 0600
+    force: false
+  loop: "{{ ssh_config__services }}"
+  tags:
+    - install
+
+- name: ssh_config/config | Add config settings
+  blockinfile:
+    path: >-
+      {{ ssh_config__dir_path }}/00_settings
+    block: |
+      {% for option, value in ssh_config__settings.items() %}
+      {{ option}} {{ value }}
+      {% endfor %}
+    mode: 0600
+    state: present
+    insertafter: '#\s*vim\s*'
+    create: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK FOR ssh_config"
+  tags:
+    - install
 
 - name: ssh_config/config | Create config
   ansible.builtin.copy:
     content: |-
       # vim: set noet ci pi sts=0 sw=4 ts=4 :
     dest: >-
-      {{ ssh_config__dir_path }}/{{ item.priority | default(ssh_config__priority, True) }}-{{ ssh_config__prefix }}{{ item.name }}
+      {{ ssh_config__dir_path }}/{{ "%02d" | format(item.priority | default(ssh_config__priority, True)) }}_{{ ssh_config__prefix }}{{ item.name }}
     mode: 0600
     force: false
   loop: "{{ ssh_config__services }}"
@@ -39,7 +46,7 @@
 - name: ssh_config/config | Add hosts
   blockinfile:
     path: >-
-      {{ ssh_config__dir_path }}/{{ item.priority | default(ssh_config__priority, True) }}-{{ ssh_config__prefix }}{{ item.name }}
+      {{ ssh_config__dir_path }}/{{ "%02d" | format(item.priority | default(ssh_config__priority, True)) }}_{{ ssh_config__prefix }}{{ item.name }}
     block: "{{ lookup('template', 'ssh_config') }}"
     mode: 0600
     state: present

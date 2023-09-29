@@ -28,5 +28,5 @@ ssh_config__settings:
   ServerAliveCountMax: 6
   Compression: 'yes'
   ControlMaster: auto
-  ControlPath: /tmp/%r@%h:%p
+  ControlPath: ${TMPDIR}/%r@%h:%p
   ControlPersist: 'yes'
