@@ -1,19 +1,17 @@
 #  vim: set et fenc=utf-8 ff=unix sts=2 sw=2 ts=2 :
 ---
 - name: ssh_config/gen-keys | Create ssh keys
-  shell: |
+  ansible.builtin.shell: |
     ! test -f {{ item }} &&
     mkdir -p $(dirname {{ item }}) &&
-    ssh-keygen -b 4096 -f {{ item }} -q -N "" -C {{ ansible_host }}
+    ssh-keygen -f {{ item }} -q -N "" -C {{ ansible_host }}
   args:
     executable: /bin/bash
     creates: "{{ item }}"
-    warn: false
-  with_items: "{{
-    ssh_config__services |
-    json_query('[*].hosts[*].key') |
-    flatten
-  }}"
+  loop: "{{
+      ssh_config__services |
+      json_query('[*].hosts[*].key') |
+      flatten
+    }}"
   tags:
     - install
-
